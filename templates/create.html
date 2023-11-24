@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}create post{% endblock title %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <center>
+
+    <h2>Upload Post</h2>
+    <form action="create" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <label for="postimage">Choose an image:</label>
+        <input type="file" name="postimage" id="postimage" accept="image/*" required>
+    
+        <label for="caption">Caption:</label>
+        <textarea name="caption" id="caption" placeholder="Write a caption..."></textarea>
+    
+        <button type="submit">Upload Post</button>
+    </form>
+</center>
+
+</body>
+</html>
+{% endblock body %}

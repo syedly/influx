@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Likes{% endblock title %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Likes</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .likes-container {
+            list-style: none;
+            padding: 0;
+        }
+
+        .like-item {
+            margin: 10px;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .like-item strong {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .like-item {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <ul class="likes-container">
+            {% for like in Like %}
+            <li class="like-item">
+                <img class="profile-img" src="{{ like.profile_img.url }}" alt="Profile Image">
+                <strong>{{like.name}}</strong>
+                <p>liked your post</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </center>
+</body>
+
+</html>
+{% endblock body %}
+{% comment "" %}{% extends "base.html" %}
+{% block title %}Likes{% endblock title %}
+{% block body %}
+<center>
+    {% for like in Like %}
+    <div>
+        <li>
+            <ul>
+                <strong>
+                    <p>{{like.name}}</p>
+                </strong>
+                <p>liked your post</p>
+            </ul>
+        </li>
+    </div>
+    {% endfor %}
+    </center>
+{% endblock body %}
+{% endcomment %}

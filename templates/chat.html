@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Messages{% endblock title %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .user-item {
+            margin-bottom: 15px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            width: 300px;
+        }
+
+        .user-info {
+            padding: 20px;
+        }
+
+        .user-info h1 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .chat-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 0 0 10px 10px;
+            cursor: pointer;
+            outline: none;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .chat-button:hover {
+            background-color: #0056b3;
+        }
+
+        .user-avatar {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .small-profile-img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px 10px 0 0; /* Adjusted border radius */
+            transition: transform 0.3s ease;
+        }
+
+        .small-profile-img:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="user-list">
+        {% for friendship in followers %}
+        <div class="user-item">
+            <div class="user-avatar">
+                <img class="avatar-image small-profile-img" src="{{ friendship.to_user.profile_img.url }}" alt="profile_img">
+            </div>
+            <div class="user-info">
+                <h1>Chat with {{ friendship.to_user.name }}</h1>
+                <p>Start a conversation and connect with {{ friendship.to_user.name }}!</p>
+            </div>
+            <a class="chat-button" href="{% url 'message' name=friendship.to_user.name %}">Start Chat</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
+{% endblock %}
