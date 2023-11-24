@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% block title %}Messages{% endblock title %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+    
+        #message-container {
+            max-width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow-y: auto;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+    
+        form {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+    
+        input {
+            flex-grow: 2;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+    
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+        }
+    
+        button:hover {
+            background-color: #0056b3;
+        }
+    
+        .message {
+            margin: 8px 0;
+            padding: 8px;
+            background-color: #e6e6e6;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .sender {
+            text-align: right;
+            align-items: flex-end;
+        }
+    
+        .receiver {
+            text-align: left;
+            align-items: flex-start;
+        }
+    
+        .profile-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    
+        .small-profile-img {
+            width: 80px; /* Adjusted size */
+            height: 80px; /* Adjusted size */
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .small-profile-img:hover {
+            transform: scale(1.1);
+        }
+    
+        .username {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    
+        .timestamp {
+            font-size: 12px;
+            color: #777;
+        }
+    
+        /* Style for the user list */
+        .user-list {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-top: 20px; /* Adjust the margin as needed */
+        }
+    
+        .user-item {
+            display: flex; /* Added to align items */
+            align-items: center; /* Center items vertically */
+            margin-bottom: 10px;
+        }
+    
+        .user-avatar {
+            margin-right: 10px;
+        }
+    
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+    
+        .chat-button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+            text-decoration: none; /* Remove underline */
+            margin-right:10px;
+        }
+    
+        .chat-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <div>
+        <h2>Chat with {{ recipient.name }}</h2>
+    </div>
+    
+    <!-- Updated: Add an ID to the message container for easy access -->
+    <div id="message-container">
+        {% for message in messages %}
+        <div class="message {% if message.sender == user %}sender{% else %}receiver{% endif %}">
+            <div class="username">{{ message.sender.name }}</div>
+            <p>{{ message.content }}</p>
+            <div class="timestamp">{{ message.timestamp }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <form id="message-form" method="post">
+        {% csrf_token %}
+        <input name="content" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+    </form>
+    
+    <div class="user-list">
+        {% for friendship in followers %}
+        <div class="user-item">
+            <div class="user-avatar">
+                <img class="avatar-image small-profile-img" src="{{ friendship.from_user.profile_img.url }}" alt="profile_img">
+            </div>
+            <div class="user-info">
+                <a class="chat-button" href="{% url 'message' name=friendship.from_user.name %}">Chat</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const messageForm = document.getElementById('message-form');
+            const messageContainer = document.getElementById('message-container');
+            
+            messageForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
+        
+                const formData = new FormData(messageForm);
+        
+                // Add a timestamp parameter to the URL to avoid caching
+                const urlWithTimestamp = `${window.location.href}?t=${Date.now()}`;
+        
+                // Send an AJAX request to update the message container
+                fetch(urlWithTimestamp, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Clear the input field after a successful message send
+                        document.querySelector('[name="content"]').value = '';
+        
+                        // Append the new message to the message container
+                        messageContainer.innerHTML += `
+                            <div class="message sender">
+                                <div class="username">{{ user.username }}</div>
+                                <p>${formData.get('content')}</p>
+                                <div class="timestamp">Now</div>
+                            </div>
+                        `;
+                    } else {
+                        console.error('Error:', response.statusText);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+            setInterval(function()
+            {
+                // alert(window.location.href)
+                let friend_name = window.location.href.split("%20")[1]
+                $.ajax({
+                    type: "get",
+                    url: "/ajax_messages_refresh/" + "{{ username }}" + "/" + friend_name,
+                    success:function(data)
+                    {
+                        console.log(data);
+                        // refresh div here
+
+                        // Clear the existing content of the message container
+                        $("#message-container").empty();
+
+                        // Append the new messages to the message container
+                        data.messages.forEach(function(message) {
+                            $("#message-container").append(`
+                                <div class="message ${(message.sender === '{{ user.username }}') ? 'sender' : 'receiver'}">
+                                    <div class="username">${message.sender}</div>
+                                    <p>${message.content}</p>
+                                    <div class="timestamp">${message.timestamp}</div>
+                                </div>
+                            `);
+                        });
+                    }
+                });
+            }, 10000);
+        });
+    </script>
+    
+    </body>
+
+</html>
+{% endblock %}

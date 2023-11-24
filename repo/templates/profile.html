@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block title %}Profile{% endblock title %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        #profile-pic {
+            border-radius: 50%;
+            max-width: 150px;
+            margin-top: 10px;
+        }
+
+        #button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        #button form {
+            display: flex;
+            align-items: center;
+        }
+
+        #button input {
+            margin-right: 10px;
+        }
+
+        #profile-info {
+            text-align: center;
+            padding: 10px;
+        }
+
+        #username {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #bio {
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        #friends-button {
+            margin-top: 5px;
+            background-color: #3498db;
+            color: #fff;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        #post-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .post {
+            margin: 10px;
+            width: 300px; /* Adjust the post width as needed */
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .post:hover {
+            transform: scale(1.05);
+        }
+
+        .post img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .post-content {
+            padding: 10px;
+        }
+
+        .comment-section {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input,
+        button {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1f618d;
+        }
+
+        .like-button {
+            text-decoration: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #3498db;
+        }
+
+        .like-button:hover {
+            background-color: #1f618d;
+        }
+
+        .delete-link {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: #dc3545; /* Bootstrap's danger color */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            margin-top:10px;
+        }
+    
+        /* Change the background color on hover for a visual feedback */
+        .delete-link:hover {
+            background-color: #c82333; /* Darker shade for hover effect */
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #button {
+                position: static;
+                margin-top: 10px;
+            }
+
+            #button form {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .post {
+                width: 100%; /* Make posts full-width on smaller screens */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+            <!-- Display follow requests if any -->
+            {% if follow_request %}
+                {% for request in follow_request %}
+                    <form method="post" action="{% url 'accept_follow_request' name=request.from_user.name %}">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="add" class="follow">Accept Follow Request from {{ request.from_user.name }}</button>
+                    </form>
+                    <form method="post" action="{% url 'reject_follow_request' name=request.from_user.name %}">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="remove" class="unfollow">Reject Follow Request from {{ request.from_user.name }}</button>
+                    </form>
+                {% endfor %}
+            {% endif %}
+        {% if user.profile_img %}
+        <a href="{{ user.profile_img.url }}"><img id="profile-pic" src="{{ user.profile_img.url }}" alt="Profile Picture"></a>
+        {% else %}
+        <img id="profile-pic" src="/media/influx.png" alt="Profile Picture">
+        {% endif %}
+        <div id="button" class="button">
+            <form action="/image" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="file" name="image" id="image" accept="image/*">
+                <div><button type="Submit" class="Submit">Submit</button></div>
+            </form>
+        </div>
+        {% if profile_img %}
+        <h3>Succesfully uploaded : {{profile_img.profile_img}}</h3>
+        <img src="{{ user.profile_img.url}}" alt="connect" style="max-width:100%; height:auto;">
+        {% endif %}
+        <div id="profile-info">
+            <div id="username">{{ user.name }}</div>
+            <div id="bio">{{ user.bio }}</div>
+            <a href="viewfriends" id="friends-button">View Friends</a>
+        </div>
+    </header>
+
+    <div id="post-container">
+        {% for post in Post %}
+        <!-- Sample posts -->
+        <center>
+        <div class="post">
+            {% if post.post %}
+            <div>
+            <a href="{{ post.post.url }}"><img style="max-width:100%; height:auto;" src="{{ post.post.url }}" alt="Post"></a>
+            </div>
+            {% else %}
+            <p>No Post To Show</p>
+            {% endif %}
+            <div class="post-content">
+                <strong>{{ post.caption }}</strong>
+                <p>{{ post.date }}</p>
+                <div>
+                    <a href="{% url 'viewlikes' post_id=post.id %}" class="like-button">Likes: {{ post.like.count }}</a>
+                    {% if request.user in post.like.all %}
+                    <a href="{% url 'like' post_id=post.id %}" class="like-button">Unlike</a>
+                    {% else %}
+                    <a href="{% url 'like' post_id=post.id %}" class="like-button">Like</a>
+                    {% endif %}
+                </div>
+                <div>
+                    <a href="{% url 'delete_post' post_id=post.id %}" class="delete-link">Delete</a>
+                </div>
+                <br>
+                <form action="{% url 'comments' post_id=post.id %}" method="post">
+                    {% csrf_token %}
+                    <input for='comment' name="comment" id="comment" placeholder="enter your comment" required>
+                    <button type="submit">Post Comment</button>
+                </form>
+                <div class="comment-section">
+                    <h3>Comments</h3>
+                    {% for comment in Comment %}
+                        {% if comment.post == post %}
+                        <p>{{ comment.user.name }} - {{ comment.created_at }}<br>{{ comment.comment }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </center>
+        {% endfor %}
+        <!-- Add more posts as needed -->
+    </div>
+</body>
+
+</html>
+{% endblock body %}
