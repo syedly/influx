@@ -173,6 +173,27 @@
         .chat-button:hover {
             background-color: #4da3c4;
         }
+    @media screen and (max-width: 600px) {
+        section {
+            margin-top:100px;
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center items horizontally */
+            text-align: center; /* Center text within items */
+        }
+
+        .user-item {
+            flex-direction: column; /* Stack user details vertically */
+            text-align: center; /* Center text within user details */
+        }
+
+        .user-info {
+            margin-bottom: 10px; /* Add some spacing between user items */
+        }
+
+        .button-container {
+            flex-direction: column; /* Stack buttons vertically */
+        }
+    }
     </style>
 
 {% endblock body %}
